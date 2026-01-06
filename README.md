@@ -8,6 +8,9 @@
 
 This project builds a BERT-based text classification pipeline to identify immigrant- and migrant-serving nonprofit organizations at scale from the IRS Business Master File (BMF). Because immigrant-serving organizations are not explicitly labeled in federal nonprofit data, this project uses supervised learning with curated positive examples to infer organizational focus from text-based identifiers.
 
+## Pipeline Overview
+Raw nonprofit data is cleaned and standardized, embedded using pretrained BERT models, and classified to identify immigrant-serving organizations at scale.
+
 The final output is a cleaned, deduplicated list of predicted immigrant-serving nonprofits, suitable for research, policy analysis, or nonprofit sector mapping.
 
 ## Goals
