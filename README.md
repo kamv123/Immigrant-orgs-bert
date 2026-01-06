@@ -18,12 +18,9 @@ The final output is a cleaned, deduplicated list of predicted immigrant-serving 
 Researchers and practitioners often lack a reliable way to identify immigrant-serving nonprofits in large administrative datasets. Existing classifications are incomplete or inconsistent, and manual review does not scale.
 
 This project addresses that gap by:
-
-Leveraging pretrained BERT embeddings to capture semantic meaning in organization names and descriptors
-
-Combining multiple trusted data sources to construct a labeled training set
-
-Applying the trained model to the full IRS BMF to generate new predictions
+- Leveraging pretrained BERT embeddings to capture semantic meaning in organization names
+- Combining multiple trusted data sources to construct a labeled training set
+- Applying the trained model to the full IRS BMF to generate new predictions
 
 ## Data Sources
 
