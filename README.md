@@ -59,6 +59,84 @@ The trained classifier is applied to the full IRS BMF
 
 Predictions are cleaned, deduplicated, and exported as final outputs
 
+## Representative Code Snippets
+
+Below are selected excerpts from the private implementation that illustrate key components of the pipeline.
+
+### Organization Name Cleaning
+```python
+import pandas as pd
+import re
+
+def clean_org_name(name):
+    if pd.isnull(name):
+        return ""
+    name = name.lower()
+    name = re.sub(r'[^a-z0-9\s]', '', name)
+    name = re.sub(
+        r'\b(the|inc|llc|foundation|co|corp|association|assn|org|of|and|a|an)\b',
+        '',
+        name
+    )
+    return re.sub(r'\s+', ' ', name).strip()
+```
+### EIN Standardization for Cross-Dataset Matching
+```python
+BMF_sub['EIN_clean'] = (
+    BMF_sub['EIN']
+    .astype(str)
+    .str.replace(r'\D', '', regex=True)
+    .str.zfill(9)
+)
+
+df_final['EIN_clean'] = (
+    df_final['EIN']
+    .astype(str)
+    .str.replace(r'\D', '', regex=True)
+    .str.zfill(9)
+)
+```
+### Similarity-Based Negative Sampling
+```python
+threshold = 90
+
+matched_to_exclude = match_df.loc[
+    match_df['similarity_score'] >= threshold,
+    'matched_bmf_name'
+].unique()
+
+BMF_non_immigrant = BMF_sub[
+    ~BMF_sub['org_clean'].isin(matched_to_exclude)
+]
+```
+### Baseline Text Classifier (TF-IDF + Logistic Regression)
+```python
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
+
+vectorizer = TfidfVectorizer(
+    stop_words='english',
+    max_features=1000
+)
+
+X = vectorizer.fit_transform(combined_df['org_clean'])
+y = combined_df['label']
+
+clf = LogisticRegression(max_iter=1000)
+clf.fit(X, y)
+```
+### BERT Model Initialization
+```python
+import torch
+from transformers import BertTokenizer, BertModel
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+bert_model = BertModel.from_pretrained('bert-base-uncased').to(device)
+bert_model.eval()
+```
+
 ## Key Takeaways
 
 Semantic embeddings significantly improve identification of mission-driven nonprofits compared to keyword rules
